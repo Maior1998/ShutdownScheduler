@@ -1,0 +1,60 @@
+﻿<Window x:Class="ShutdownScheduler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShutdownScheduler"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewModel="clr-namespace:ShutdownScheduler.ViewModel"
+        xmlns:controls="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        FontSize="16"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Title="Планировщик завершения работы" Height="300" Width="500">
+    <Window.DataContext>
+        <viewModel:ViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <DockPanel LastChildFill="False" Grid.Row="0" HorizontalAlignment="Center">
+            <RadioButton Content="Выключение" DockPanel.Dock="Left" Margin="5" IsChecked="{Binding IsRestart, Converter={StaticResource BoolInverterConverter}, Mode=OneWay}"/>
+            <RadioButton Content="Перезагрузка" DockPanel.Dock="Right" Margin="5" IsChecked="{Binding IsRestart, Mode=TwoWay}"/>
+        </DockPanel>
+            <RadioButton Grid.Row="1" GroupName="ActionType" IsChecked="{Binding Type, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter={x:Static viewModel:ActionType.ExactTime}}">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Точное время: "/>
+                    <Label Content="Дата"/>
+                    <DatePicker Width="100" Margin="10 0" SelectedDate="{Binding Date}"/>
+                    <Label Content="Время"/>
+                    <materialDesign:TimePicker Width="100" Margin="10 0" SelectedTime="{Binding Time}"/>
+            </StackPanel>
+            </RadioButton>
+
+
+        <RadioButton GroupName="ActionType" Grid.Row="2" IsChecked="{Binding Type, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter={x:Static viewModel:ActionType.OffsetDateTime}}">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Часы: " VerticalAlignment="Center"/>
+                    <controls:OversizedNumberSpinner Max="100" Min="0" Value="{Binding SelectedHours, Mode=TwoWay}"/>
+                    <Label Content="Минуты: " VerticalAlignment="Center"/>
+                    <controls:OversizedNumberSpinner Max="59" Min="0" Value="{Binding SelectedMinutes, Mode=TwoWay}"/>
+                    <Label Content="Секунды: " VerticalAlignment="Center"/>
+                    <controls:OversizedNumberSpinner Max="59" Min="0" Value="{Binding SelectedSeconds, Mode=TwoWay}"/>
+                </StackPanel>
+            </RadioButton>
+        
+        <DockPanel Grid.Row="3" LastChildFill="False">
+            <RadioButton Content="Секунды: " GroupName="ActionType" IsChecked="{Binding Type, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter={x:Static viewModel:ActionType.OffsetSeconds}}"/>
+            <TextBox Width="50" Text="{Binding Seconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </DockPanel>
+        <RadioButton Grid.Row="4" Content="Отменить запланированную операцию" GroupName="ActionType" IsChecked="{Binding Type, Converter={StaticResource EnumToRadioButtonConverter}, ConverterParameter={x:Static viewModel:ActionType.Cancel}}"/>
+            <Button Content="Выполнить" Grid.Row="5" HorizontalAlignment="Center" DockPanel.Dock="Bottom" Margin="10" Command="{Binding Start}"/>
+    </Grid>
+</Window>
